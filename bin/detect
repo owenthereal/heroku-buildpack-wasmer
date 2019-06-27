@@ -3,4 +3,8 @@
 
 set -e
 
-echo wasmer
+if [ -f $1/wapm.toml ]; then
+  echo "Wasmer" && exit 0
+else
+  echo "no" && exit 1
+fi

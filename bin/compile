@@ -7,13 +7,27 @@ set -e
 # debug
 # set -x
 
-export BUILD_DIR=$1
-export CACHE_DIR=$2
+BUILD_DIR=$1
+CACHE_DIR=$2
+WASMER_BUILD_DIR=$BUILD_DIR/.wasmer
 
-INSTALL_DIRECTORY=$BUILD_DIR curl https://get.wasmer.io -sSfL | sh
+function topic() {
+  echo "-----> $*"
+}
 
-cat <<EOS > $BUILD_DIR/.profile
-export WASMER_DIR="$BUILD_DIR/.wasmer"
+mkdir -p $WASMER_BUILD_DIR
+
+# install wasmer to $WASMER_BUILD_DIR
+export INSTALL_DIRECTORY=$WASMER_BUILD_DIR
+curl https://get.wasmer.io -sSfL | sh
+
+mkdir -p $BUILD_DIR/.profile.d
+cat <<EOS > $BUILD_DIR/.profile.d/000_wasmer.sh
+export WASMER_DIR="/app/.wasmer"
 export WASMER_CACHE_DIR="\$WASMER_DIR/cache"
 export PATH="\$WASMER_DIR/bin:\$WASMER_DIR/globals/wapm_packages/.bin:\$PATH"
 EOS
+
+topic "Installing WebAssembly packages"
+source $WASMER_BUILD_DIR/wasmer.sh
+cd $BUILD_DIR && wapm install && cd -
