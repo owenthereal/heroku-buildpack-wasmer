@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# bin/compile <build-dir> <cache-dir>
+
+# fail fast
+set -e
+
+# debug
+# set -x
+
+export BUILD_DIR=$1
+export CACHE_DIR=$2
+
+INSTALL_DIRECTORY=$BUILD_DIR curl https://get.wasmer.io -sSfL | sh
+
+cat <<EOS > $BUILD_DIR/.profile
+export WASMER_DIR="$BUILD_DIR/.wasmer"
+export WASMER_CACHE_DIR="\$WASMER_DIR/cache"
+export PATH="\$WASMER_DIR/bin:\$WASMER_DIR/globals/wapm_packages/.bin:\$PATH"
+EOS
